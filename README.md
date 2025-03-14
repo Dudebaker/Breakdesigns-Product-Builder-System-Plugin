@@ -1,6 +1,6 @@
 # Breakdesigns Product Builder System Plugin
 
-The Breakdesigns Product Builder does not deliver the ability to group the configurated products in the cart.<br>
+The [![Breakdesigns Product Builder](https://breakdesigns.net/extensions/joomla/product-builder)](https://breakdesigns.net/extensions/joomla/product-builder) (Virtuemart Extension) does not deliver the ability to group the configurated products in the cart.<br>
 They are all shown as independant products as the user had added them manually.
 
 This system plugin adds the ability to show them grouped together.<br>
