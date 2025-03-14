@@ -23,4 +23,4 @@ The remove-from-cart function for the complete configuration is done with this p
 
 <b>You need template-overrides which do the visible grouping!</b>
 
-[![Download Breakdesigns Product Builder Template Overrides](https://img.shields.io/badge/Download-Breakdesigns_Product_Builder_Template_Overrides-EF7554?&logo=github&style=for-the-badge)](https://github.com/Dudebaker/Breakdesigns-Product-Builder-Template-Overrides)
+[![Download Breakdesigns Product Builder Template Overrides](https://img.shields.io/badge/Download-Breakdesigns_Product_Builder_Template_Overrides-EF7554?&logo=github&style=for-the-badge)](https://github.com/Dudebaker/Breakdesigns-Product-Builder-Cart-Template-Overrides)
