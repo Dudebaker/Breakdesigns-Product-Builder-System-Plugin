@@ -11,12 +11,16 @@
 	
 	namespace Joomla\Plugin\System\BreakdesignsProductBuilder\Extension;
 	
+	use Joomla\CMS\Factory;
+	use Joomla\CMS\Installer\Installer;
 	use Joomla\CMS\Language\Text;
 	use Joomla\CMS\Plugin\CMSPlugin;
 	use Joomla\CMS\Router\Route;
 	use Joomla\Database\DatabaseAwareTrait;
+	use Joomla\Database\DatabaseInterface;
 	use Joomla\Event\Event;
 	use Joomla\Event\SubscriberInterface;
+	use Joomla\Plugin\System\BreakdesignsProductBuilder\Helper\CoreFileExtenderHelper;
 	use VirtueMartCart;
 	use VmConfig;
 	
@@ -35,9 +39,13 @@
 		public static function getSubscribedEvents() : array
 		{
 			return [
-				'onAfterInitialise'      => 'onAfterInitialise',
-				'plgVmOnAddToCartFilter' => 'onAddToCartFilter',
-				#'plgVmOnRemoveFromCart'  => 'onRemoveFromCart'
+				'onAfterInitialise'                         => 'onAfterInitialise',
+				'onExtensionAfterUpdate'                    => 'onExtensionAfterUpdate',
+				'onInstallerAfterInstaller'                 => 'onInstallerAfterInstaller',
+				'plgVmOnAddToCartBreakDesignProductBuilder' => 'onAddToCartBreakDesignProductBuilder',
+				#'plgVmOnAddToCart'                          => 'onAddToCart',
+				#'plgVmOnAddToCartFilter'                    => 'onAddToCartFilter',
+				#'plgVmOnRemoveFromCart'                     => 'onRemoveFromCart'
 			];
 		}
 		
@@ -52,8 +60,109 @@
 		 */
 		public function onAfterInitialise() : void
 		{
+			$this->CheckCoreFileExtender() ||
 			$this->CheckForUpdateCartEvent() ||
 			$this->TaskRemoveProductBuilderProductsFromCart();
+		}
+		
+		/**
+		 * Listener for the `onExtensionAfterUpdate` event
+		 *
+		 * Executed after update of an extension (but not always?)
+		 * Check if any overrides have to be added
+		 *
+		 * @param \Joomla\CMS\Installer\Installer|null $installer Installer object
+		 *
+		 * @return  void
+		 *
+		 * @since        version
+		 * @noinspection PhpMissingParamTypeInspection
+		 */
+		public function onExtensionAfterUpdate($installer = null) : void
+		{
+			CoreFileExtenderHelper::checkOverrides($installer);
+		}
+		
+		/**
+		 * Listener for the `onInstallerAfterInstaller` event
+		 *
+		 * Executed after installation of an extension (or update via install instead of update in backend)
+		 * Check if any overrides have to be added
+		 *
+		 * @param \Joomla\Event\Event|null $event
+		 *
+		 * @since version
+		 */
+		public function onInstallerAfterInstaller(Event $event = null) : void
+		{
+			if ($event === null)
+			{
+				return;
+			}
+			
+			$arguments = $event->getArguments();
+			
+			foreach ($arguments as $argument)
+			{
+				if ($argument instanceof Installer)
+				{
+					CoreFileExtenderHelper::checkOverrides($argument);
+					break;
+				}
+			}
+		}
+		
+		/**
+		 * Listener for the `plgVmOnAddToCart` event
+		 *
+		 * This event is triggered after a product got added to the cart
+		 *
+		 * @param \Joomla\Event\Event|null $event
+		 *
+		 * @return  void
+		 *
+		 * @since version
+		 */
+		public function onAddToCart(?Event $event) : void
+		{
+			# Here we are too late, the product gets added up to the already existing ones which maybe do not have the pbproduct_id set, so the whole is done with the own onAddToCartBreakDesignProductBuilder event
+			
+			
+			/*if ($event === null)
+			{
+				return;
+			}
+			
+			$cart = $event->getArgument(0);
+			if (empty($cart))
+			{
+				return;
+			}
+			
+			$input         = $this->getApplication()?->getInput();
+			$pbProductId   = $input->getInt('pbproduct_id', 0);
+			$pbproductUuid = $input->getString('pbproduct_uuid', 0);
+			
+			if ($pbProductId === 0)
+			{
+				return;
+			}
+			
+			foreach ($cart->cartProductsData as $cart_key => $row)
+			{
+				if ($row['virtuemart_product_id'] !== $cart->lastAddedProduct)
+				{
+					continue;
+				}
+				
+				$row['customProductData']['pbproduct_id']   = $pbProductId;
+				$row['customProductData']['pbproduct_uuid'] = $pbproductUuid;
+				
+				$cart->cartProductsData[$cart_key] = $row;
+				break;
+			}
+			
+			$event->setArgument(0, $cart);*/
 		}
 		
 		/**
@@ -69,7 +178,10 @@
 		 */
 		public function onAddToCartFilter(?Event $event) : void
 		{
-			if ($event === null)
+			# This does only work if the product has customfields, otherwise the event does not get triggered, so the whole is done with the own onAddToCartBreakDesignProductBuilder event
+			
+			
+			/*if ($event === null)
 			{
 				return;
 			}
@@ -107,7 +219,43 @@
 			$customProductData['pbproduct_uuid'] = $pbproductUuid;
 			
 			$event->setArgument($arrayKeyCustomProductData, $customProductData);
-			$event->setArgument($arrayKeyCustomFiltered, true);
+			$event->setArgument($arrayKeyCustomFiltered, true);*/
+		}
+		
+		/**
+		 * Listener for the `plgOnAddToCartBreakDesignProductBuilder` event
+		 *
+		 * This event is triggered before the customfields of a product get checked
+		 *
+		 * @param \Joomla\Event\Event|null $event
+		 *
+		 * @return  void
+		 *
+		 * @since version
+		 */
+		public function onAddToCartBreakDesignProductBuilder(?Event $event) : void
+		{
+			if ($event === null)
+			{
+				return;
+			}
+			
+			$productData = $event->getArgument(0);
+			
+			$input         = $this->getApplication()?->getInput();
+			$pbProductId   = $input->getInt('pbproduct_id', 0);
+			$pbproductUuid = $input->getString('pbproduct_uuid', 0);
+			
+			if ($pbProductId === 0)
+			{
+				return;
+			}
+			
+			$productData['customProductData']['pbproduct_id']         = $pbProductId;
+			$productData['customProductData']['pbproduct_uuid']       = $pbproductUuid;
+			$productData['customProductData']['pbproduct_uuid_entry'] = uniqid('', true);
+			
+			$event->setArgument(0, $productData);
 		}
 		
 		/**
@@ -133,6 +281,42 @@
 		#endregion
 		
 		#region Request Handling
+		
+		/**
+		 * Checks if the core file extension exists only if the plugin parameter is set to do so
+		 *
+		 * @since version
+		 */
+		public function CheckCoreFileExtender() : bool
+		{
+			if (!$this->getApplication()?->isClient('administrator'))
+			{
+				return false;
+			}
+			
+			$checkCoreExtension = $this->params->get('check_core_extension', 1);
+			
+			if (!$checkCoreExtension)
+			{
+				return false;
+			}
+			
+			CoreFileExtenderHelper::checkOverrides(null, true);
+			
+			$db    = Factory::getContainer()->get(DatabaseInterface::class);
+			$query = $db->getQuery(true)
+			            ->update($db->quoteName('#__extensions'))
+			            ->set($db->quoteName('params') . ' = ' . $db->quote(json_encode(['check_core_extension' => 0])))
+			            ->where($db->quoteName('element') . ' = ' . $db->quote('breakdesignsproductbuilder'))
+			            ->where($db->quoteName('type') . ' = ' . $db->quote('plugin'))
+			            ->where($db->quoteName('folder') . ' = ' . $db->quote('system'));
+			$db->setQuery($query);
+			$db->execute();
+			
+			$this->getApplication()?->enqueueMessage(Text::_('Core file extender checked'));
+			
+			return true;
+		}
 		
 		/**
 		 * Check if a product builder product gets changed (removed or quantity changed)

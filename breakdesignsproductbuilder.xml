@@ -7,7 +7,7 @@
     <creationDate>2025-03-12</creationDate>
     <copyright>(C) Open Source Matters, Inc.</copyright>
     <license>GNU General Public License version 2 or later</license>
-    <version>1.0.0</version>
+    <version>1.1.0</version>
     <description>PLG_SYSTEM_BREAKDESIGNS_PRODUCT_BUILDER_XML_DESCRIPTION</description>
     <namespace path="src">Joomla\Plugin\System\BreakdesignsProductBuilder</namespace>
     <files>
@@ -15,4 +15,15 @@
         <folder>src</folder>
         <folder>language</folder>
     </files>
+    <scriptfile>src/Script.php</scriptfile>
+    <config>
+        <fields name="params">
+            <fieldset name="basic">
+                <field name="check_core_extension" type="radio" default="1" label="PLG_SYSTEM_BREAKDESIGNS_PRODUCT_BUILDER_CORE_FILE_EXTENSION_LABEL" description="PLG_SYSTEM_BREAKDESIGNS_PRODUCT_BUILDER_CORE_FILE_EXTENSION_DESC">
+                    <option value="0">No</option>
+                    <option value="1">Yes</option>
+                </field>
+            </fieldset>
+        </fields>
+    </config>
 </extension>
