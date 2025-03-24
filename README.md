@@ -9,7 +9,7 @@ The remove-from-cart function for the complete configuration is done with this p
 
 <br>
 
-[![Download Breakdesigns Product Builder System Plugin](https://img.shields.io/github/v/release/Dudebaker/Breakdesigns-Product-Builder-System-Plugin?logo=github&label=Download%20Breakdesigns%20Product%20Builder%20System%20Plugin&color=blueviolet&style=for-the-badge)](https://github.com/Dudebaker/Breakdesigns-Product-Builder-System-Plugin/releases/download/v1.0.0/plg_system_breakdesignsproductbuilder.zip)
+[![Download Breakdesigns Product Builder System Plugin](https://img.shields.io/github/v/release/Dudebaker/Breakdesigns-Product-Builder-System-Plugin?logo=github&label=Download%20Breakdesigns%20Product%20Builder%20System%20Plugin&color=blueviolet&style=for-the-badge)](https://github.com/Dudebaker/Breakdesigns-Product-Builder-System-Plugin/releases/download/v1.1.0/plg_system_breakdesignsproductbuilder.zip)
 
 <b>Tested with:</b><br> 
 [![](https://img.shields.io/badge/Joomla-v5.2-2E5C6B?logo=joomla&logoColor=white&style=for-the-badge)](https://downloads.joomla.org/)<br>
